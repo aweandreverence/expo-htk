@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     },
     caret: {
         position: 'absolute',
-        top: -10,
+        top: -10, // Position above the modal
         width: 0,
         height: 0,
         borderLeftWidth: 10,
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
         borderBottomWidth: 10,
         borderLeftColor: 'transparent',
         borderRightColor: 'transparent',
-        borderBottomColor: Colors.$backgroundDefault,
+        borderBottomColor: 'white',
         alignSelf: 'center',
     },
     modalTitle: {

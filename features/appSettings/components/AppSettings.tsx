@@ -4,9 +4,7 @@ import { View } from 'react-native-ui-lib';
 
 import { AppSettingsState } from '../types';
 import { AppSettingsContainer } from './Container';
-import { AppSettingsEntryFontSize, AppSettingsEntrySwitch } from './Entries';
-import { AppSettingsEntryModal } from './Entries/FontFamily';
-import { FONT_FAMILY_CHOICES } from '@/constants/general';
+import { AppSettingsEntryFontSize, AppSettingsEntrySwitch, AppSettingsModalFontFamily } from './Entries';
 
 export interface AppSettingsProps<TSettings extends Record<string, any>> {
     hook: () => AppSettingsState<TSettings>;
@@ -23,6 +21,8 @@ export interface AppSettingsSectionItem<TSettings extends Record<string, any>> {
     component: 'switch' | 'font-size' | 'font-family';
     title: string;
     description?: string;
+    options: string[];
+    onPress: () => void;
 }
 
 export function AppSettings<TSettings extends Record<string, any>>({
@@ -33,7 +33,7 @@ export function AppSettings<TSettings extends Record<string, any>>({
 
     const renderSections = sections.map((section, index) => {
         const renderItems = section.items.map(
-            ({ field, component, ...item }, index) => {
+            ({ field, component, options, ...item }, index) => {
                 let rendered = null;
                 if (component === 'switch') {
                     rendered = (
@@ -55,10 +55,10 @@ export function AppSettings<TSettings extends Record<string, any>>({
                     );
                 } else if (component === 'font-family') {
                     rendered = (
-                        <AppSettingsEntryModal<TSettings>
+                        <AppSettingsModalFontFamily<TSettings>
                             field={field}
                             value={settings[field]}
-                            options={FONT_FAMILY_CHOICES}
+                            options={options}
                             dispatch={settings.dispatch}
                             {...item}
                         />
