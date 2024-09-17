@@ -89,7 +89,9 @@ export function createTheme({
                 if (next.ignoreSystemMode) {
                     Colors.setScheme(scheme as SchemeType);
                 } else {
-                    Colors.setScheme('default');
+                    // Revert to system default if ignoreSystemMode is false
+                    const systemScheme = Appearance.getColorScheme() as 'light' | 'dark' | null;
+                    Colors.setScheme(systemScheme || 'default');
                 }
 
                 return next;
@@ -121,7 +123,12 @@ export function createTheme({
         );
 
         React.useEffect(() => {
-            Colors.setScheme(scheme as SchemeType);
+            if (ignoreSystemMode) {
+                Colors.setScheme(scheme as SchemeType);
+            } else {
+                const systemScheme = Appearance.getColorScheme() as 'light' | 'dark' | null;
+                Colors.setScheme(systemScheme || 'default');
+            }
             setNavThemeState(
                 createReactNavigationTheme(
                     availableSchemes[scheme],
@@ -145,7 +152,8 @@ export function createTheme({
                 if (next.ignoreSystemMode) {
                     Colors.setScheme(prev.scheme || defaultScheme);
                 } else {
-                    Colors.setScheme('default');
+                    const systemScheme = Appearance.getColorScheme() as 'light' | 'dark' | null;
+                    Colors.setScheme(systemScheme || 'default');
                 }
 
                 return next;
