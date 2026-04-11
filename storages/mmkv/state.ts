@@ -1,49 +1,64 @@
-import * as Device from 'expo-device';
+import type { MMKVConfiguration } from 'react-native-mmkv';
 import { Platform } from 'react-native';
-import { MMKV, type MMKVConfiguration } from 'react-native-mmkv';
+
+type MMKVInstance = {
+    getString: (key: string) => string | undefined;
+    set: (key: string, value: string) => void;
+    delete: (key: string) => void;
+    clearAll: () => void;
+};
+
+type MMKVModule = {
+    MMKV: new (configuration?: MMKVConfiguration) => MMKVInstance;
+};
+
+function isMacLikeIOSRuntime(): boolean {
+    if (Platform.OS !== 'ios') {
+        return false;
+    }
+
+    const platform = Platform as typeof Platform & {
+        isMacCatalyst?: boolean;
+        constants?: { systemName?: string; isMacCatalyst?: boolean };
+    };
+
+    return (
+        platform.isMacCatalyst === true ||
+        platform.constants?.isMacCatalyst === true ||
+        platform.constants?.systemName === 'macOS'
+    );
+}
+
+function loadMMKVModule(): MMKVModule | null {
+    try {
+        return require('react-native-mmkv') as MMKVModule;
+    } catch (e) {
+        console.warn('[MMKV] Failed to load module, using in-memory fallback:', e);
+        return null;
+    }
+}
 
 /**
  * Creates an instance of MMKV state storage with optional configuration.
  * Lazy-initializes MMKV to avoid crashes during module loading.
- * Falls back to in-memory storage if MMKV is unavailable (e.g. remote debugger).
- *
- * @param  configuration - Optional MMKV configuration.
- * @returns An object with methods to interact with MMKV storage.
- * @returns {Function} getItem - Retrieves a string value for a given key. Returns null if the key does not exist.
- * @returns {Function} setItem - Stores a string value with the given key.
- * @returns {Function} removeItem - Removes the value associated with the given key.
- * @returns {Function} clearAll - Clears all data stored in MMKV.
- *
- * @example
- * const storage = createMMVKStateStorage();
- * storage.setItem('key', 'value');
- * const value = storage.getItem('key'); // 'value'
- * storage.removeItem('key');
- * const clearedValue = storage.getItem('key'); // null
- * storage.clearAll();
+ * Falls back to in-memory storage if MMKV is unavailable.
  */
 export function createMMVKStateStorage(configuration?: MMKVConfiguration) {
-    let storage: MMKV | null = null;
+    let storage: MMKVInstance | null = null;
     let initFailed = false;
     const fallback = new Map<string, string>();
-    const isMacLikeIOSRuntime =
-        Platform.OS === 'ios' &&
-        (((Platform as typeof Platform & {
-            isMacCatalyst?: boolean;
-            constants?: { systemName?: string; isMacCatalyst?: boolean };
-        }).isMacCatalyst === true ||
-            Platform.constants?.isMacCatalyst === true ||
-            Platform.constants?.systemName === 'macOS' ||
-            Device.osName === 'macOS' ||
-            Device.deviceType === Device.DeviceType.DESKTOP ||
-            Device.modelName?.includes('Mac') === true ||
-            Device.modelId?.startsWith('Mac') === true));
 
-    function getStorage(): MMKV | null {
-        if (initFailed || isMacLikeIOSRuntime) return null;
+    function getStorage(): MMKVInstance | null {
+        if (initFailed || isMacLikeIOSRuntime()) return null;
         if (!storage) {
+            const mmkvModule = loadMMKVModule();
+            if (!mmkvModule) {
+                initFailed = true;
+                return null;
+            }
+
             try {
-                storage = new MMKV(configuration);
+                storage = new mmkvModule.MMKV(configuration);
             } catch (e) {
                 console.warn('[MMKV] Failed to initialize, using in-memory fallback:', e);
                 initFailed = true;
