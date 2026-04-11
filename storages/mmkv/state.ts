@@ -1,3 +1,4 @@
+import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 import { MMKV, type MMKVConfiguration } from 'react-native-mmkv';
 
@@ -27,12 +28,16 @@ export function createMMVKStateStorage(configuration?: MMKVConfiguration) {
     const fallback = new Map<string, string>();
     const isMacLikeIOSRuntime =
         Platform.OS === 'ios' &&
-        ((Platform as typeof Platform & {
+        (((Platform as typeof Platform & {
             isMacCatalyst?: boolean;
             constants?: { systemName?: string; isMacCatalyst?: boolean };
         }).isMacCatalyst === true ||
             Platform.constants?.isMacCatalyst === true ||
-            Platform.constants?.systemName === 'macOS');
+            Platform.constants?.systemName === 'macOS' ||
+            Device.osName === 'macOS' ||
+            Device.deviceType === Device.DeviceType.DESKTOP ||
+            Device.modelName?.includes('Mac') === true ||
+            Device.modelId?.startsWith('Mac') === true));
 
     function getStorage(): MMKV | null {
         if (initFailed || isMacLikeIOSRuntime) return null;
