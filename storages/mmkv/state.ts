@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import { MMKV, type MMKVConfiguration } from 'react-native-mmkv';
 
 /**
@@ -24,9 +25,17 @@ export function createMMVKStateStorage(configuration?: MMKVConfiguration) {
     let storage: MMKV | null = null;
     let initFailed = false;
     const fallback = new Map<string, string>();
+    const isMacLikeIOSRuntime =
+        Platform.OS === 'ios' &&
+        ((Platform as typeof Platform & {
+            isMacCatalyst?: boolean;
+            constants?: { systemName?: string; isMacCatalyst?: boolean };
+        }).isMacCatalyst === true ||
+            Platform.constants?.isMacCatalyst === true ||
+            Platform.constants?.systemName === 'macOS');
 
     function getStorage(): MMKV | null {
-        if (initFailed) return null;
+        if (initFailed || isMacLikeIOSRuntime) return null;
         if (!storage) {
             try {
                 storage = new MMKV(configuration);
