@@ -2,7 +2,7 @@ import { createLocalStorageStateStorage } from '@htk/storages/localStorage/state
 import { createMMVKStateStorage } from '@htk/storages/mmkv/state';
 import { atomWithStorage, createJSONStorage } from 'jotai/utils';
 import { Platform } from 'react-native';
-import type { MMKVConfiguration } from 'react-native-mmkv';
+import type { MMKVStorageConfiguration } from '@htk/storages/mmkv/state';
 
 /**
  * Creates a persisted state atom using the specified storage configuration.
@@ -18,7 +18,7 @@ import type { MMKVConfiguration } from 'react-native-mmkv';
  * const usePersistedState = createPersistedState();
  * const myAtom = usePersistedState('myKey', 'defaultValue');
  */
-export function createPersistedState(configuration?: MMKVConfiguration) {
+export function createPersistedState(configuration?: MMKVStorageConfiguration) {
     const storage =
         Platform.OS === 'web'
             ? createLocalStorageStateStorage()
