@@ -22,7 +22,7 @@ export function AppSettingsModalFontFamily<TSettings extends Record<string, any>
 }: AppSettingsModalFontFamilyProps<TSettings>) {
     const [isModalVisible, setModalVisible] = useState(false);
     const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
-    const modalButtonRef = useRef(null);
+    const modalButtonRef = useRef<View>(null);
 
     const handleOptionSelect = (selectedOption: string) => {
         dispatch(field, selectedOption);

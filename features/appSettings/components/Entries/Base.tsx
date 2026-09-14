@@ -3,7 +3,7 @@ import { Text, TouchableOpacity, View } from 'react-native-ui-lib';
 export interface AppSettingsEntryBaseProps {
     title: string;
     description?: string;
-    onPress: () => void;
+    onPress?: () => void;
     children: React.ReactNode;
 }
 
