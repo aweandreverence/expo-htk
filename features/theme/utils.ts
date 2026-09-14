@@ -1,5 +1,7 @@
-import { DarkTheme, DefaultTheme, type Theme as NavigationTheme } from '@react-navigation/native';
+import { DarkTheme, DefaultTheme } from '@react-navigation/native';
 import { Colors, DesignTokens, DesignTokensDM } from 'react-native-ui-lib';
+
+type NavigationTheme = typeof DefaultTheme;
 
 export function createScheme(scheme: Record<string, string>, isDark: boolean) {
     return {
