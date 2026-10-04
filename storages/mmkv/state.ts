@@ -1,4 +1,7 @@
-import { MMKV, type MMKVConfiguration } from 'react-native-mmkv';
+import { MMKV } from 'react-native-mmkv';
+
+// Infer the installed constructor's config: MMKV 2 and 3 export different type names.
+export type MMKVStorageConfiguration = ConstructorParameters<typeof MMKV>[0];
 
 /**
  * Creates an instance of MMKV state storage with optional configuration.
@@ -20,7 +23,7 @@ import { MMKV, type MMKVConfiguration } from 'react-native-mmkv';
  * const clearedValue = storage.getItem('key'); // null
  * storage.clearAll();
  */
-export function createMMVKStateStorage(configuration?: MMKVConfiguration) {
+export function createMMVKStateStorage(configuration?: MMKVStorageConfiguration) {
     let storage: MMKV | null = null;
     let initFailed = false;
     const fallback = new Map<string, string>();

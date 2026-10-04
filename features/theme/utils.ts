@@ -1,5 +1,7 @@
-import type { Theme as NavigationTheme } from '@react-navigation/native';
+import { DarkTheme, DefaultTheme } from '@react-navigation/native';
 import { Colors, DesignTokens, DesignTokensDM } from 'react-native-ui-lib';
+
+type NavigationTheme = typeof DefaultTheme;
 
 export function createScheme(scheme: Record<string, string>, isDark: boolean) {
     return {
@@ -13,9 +15,12 @@ export function createReactNavigationTheme(
     scheme: Record<string, string>,
     isDark = false
 ): NavigationTheme {
-    return {
+    const baseTheme = isDark ? DarkTheme : DefaultTheme;
+    const theme: NavigationTheme = {
+        ...baseTheme,
         dark: isDark,
         colors: {
+            ...baseTheme.colors,
             primary: scheme.$textPrimary,
             background: scheme.$backgroundScreen || scheme.$backgroundNeutral,
             card: scheme.$backgroundDefault,
@@ -24,4 +29,5 @@ export function createReactNavigationTheme(
             notification: scheme.$textDangerLight,
         },
     };
+    return theme;
 }
